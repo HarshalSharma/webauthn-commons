@@ -1,38 +1,50 @@
-package com.harshalsharma.webauthncommons.attestationObject.v2.reader;
+package com.harshalsharma.webauthncommons.attestationObject.parsers;
 
-import com.harshalsharma.webauthncommons.attestationObject.InvalidAttestationObjException;
-import com.harshalsharma.webauthncommons.attestationObject.v2.V2AuthenticatorData;
+import com.harshalsharma.webauthncommons.attestationObject.entities.AttestedCredentialData;
+import com.harshalsharma.webauthncommons.attestationObject.entities.AuthenticatorData;
+import com.harshalsharma.webauthncommons.attestationObject.exceptions.InvalidAttestationObjException;
+import com.harshalsharma.webauthncommons.io.DataEncoderDecoder;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 /**
  * @author harshalsharma
  */
-public class V2AuthenticatorDataReader {
+public class AuthenticatorDataReader {
 
     public static final int RP_ID_HASH_BYTES_LENGTH = 32;
     public static final int FLAGS_BYTE_LENGTH = 1;
     public static final int SIGNATURE_COUNT_BYTES_LENGTH = 4;
     private static final int MIN_AUTH_DATA_LENGTH = RP_ID_HASH_BYTES_LENGTH + FLAGS_BYTE_LENGTH + SIGNATURE_COUNT_BYTES_LENGTH;
 
-    public static V2AuthenticatorData read(byte[] authData) {
+    public static AuthenticatorData read(byte[] authData) {
         if (ArrayUtils.isEmpty(authData) || authData.length < MIN_AUTH_DATA_LENGTH) {
             throw new InvalidAttestationObjException("Auth Data is in invalid format.");
         }
-        V2AuthenticatorData.V2AuthenticatorDataBuilder builder = V2AuthenticatorData.builder();
+
         byte[] rpIdHashBytes = readRpIdHashBytes(authData);
         byte flags = readFlags(authData);
         int signCount = readSignatureCount(authData);
-        V2AuthenticatorData.V2AuthenticatorDataBuilder authDataBuilder = V2AuthenticatorData.builder()
+
+        AuthenticatorData.AuthenticatorDataBuilder authDataBuilder = AuthenticatorData.builder()
                 .rpIdHash(rpIdHashBytes)
                 .flags(flags)
                 .signCount(signCount);
-        if (hasAttestedCredentialData(flags)) {
 
+        int attestedCredentialDataLength = 0;
+        if (hasAttestedCredentialData(flags)) {
+            byte[] attestedDataExtended = ArrayUtils.subarray(authData, MIN_AUTH_DATA_LENGTH, authData.length);
+            AttestedCredentialData attestedCredentialData = AttestedCredentialDataReader.read(attestedDataExtended);
+            attestedCredentialDataLength = attestedCredentialData.getBinaryLength();
+            authDataBuilder.attestedCredentialData(attestedCredentialData);
         }
         if (hasExtensions(flags)) {
-
+            byte[] extensions = ArrayUtils.subarray(authData,
+                    MIN_AUTH_DATA_LENGTH + attestedCredentialDataLength, authData.length);
+            Map<?, ?> extensionsMap = DataEncoderDecoder.fromCbor(extensions, Map.class);
+            authDataBuilder.extensions(extensionsMap);
         }
         return authDataBuilder.build();
     }

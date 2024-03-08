@@ -1,15 +1,17 @@
-package com.harshalsharma.webauthncommons.attestationObject.v2;
+package com.harshalsharma.webauthncommons.attestationObject.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.Map;
+
 @Getter
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class V2AuthenticatorData {
+public class AuthenticatorData {
 
     private static final int SIGN_COUNT_SIZE = 4;
     private static final int RP_ID_HASH_SIZE = 32;
@@ -39,10 +41,10 @@ public class V2AuthenticatorData {
     /**
      * variable length, attestedCredentialData.
      */
-    private V2AttestedCredentialData attestedCredentialData;
+    private AttestedCredentialData attestedCredentialData;
 
     /**
      * extensions.
      */
-    private byte[] extensions;
+    private Map<?, ?> extensions;
 }
