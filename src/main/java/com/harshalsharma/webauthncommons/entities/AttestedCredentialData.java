@@ -1,5 +1,6 @@
-package com.harshalsharma.webauthncommons.attestationObject.entities;
+package com.harshalsharma.webauthncommons.entities;
 
+import com.harshalsharma.webauthncommons.publickey.PublicKeyCredential;
 import lombok.Builder;
 import lombok.Getter;
 

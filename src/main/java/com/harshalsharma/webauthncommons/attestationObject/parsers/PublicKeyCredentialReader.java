@@ -1,10 +1,11 @@
 package com.harshalsharma.webauthncommons.attestationObject.parsers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.harshalsharma.webauthncommons.attestationObject.entities.PublicKeyCredential;
-import com.harshalsharma.webauthncommons.attestationObject.entities.SupportedPublicKeyAlg;
-import com.harshalsharma.webauthncommons.attestationObject.exceptions.UnsupportedPublicKeyCredential;
 import com.harshalsharma.webauthncommons.io.CborObject;
+import com.harshalsharma.webauthncommons.publickey.PublicKeyCredential;
+import com.harshalsharma.webauthncommons.publickey.SupportedPublicKeyAlg;
+import com.harshalsharma.webauthncommons.publickey.UnsupportedPublicKeyCredential;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -77,7 +78,7 @@ public class PublicKeyCredentialReader {
         return PublicKeyCredential.builder()
                 .cborPublicKeyCredential(publicKeyCredentialCbor.getCborBytes())
                 .keyType(keyType)
-                .keySpec(keySpec)
+                .encodedKeySpec(Base64.encodeBase64String(keySpec.getEncoded()))
                 .alg(alg.get().name()).build();
     }
 

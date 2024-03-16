@@ -1,8 +1,7 @@
 package com.harshalsharma.webauthncommons.attestationObject;
 
-import com.harshalsharma.webauthncommons.attestationObject.entities.AttestationObject;
-
-import java.security.spec.X509EncodedKeySpec;
+import com.harshalsharma.webauthncommons.entities.AttestationObject;
+import com.harshalsharma.webauthncommons.publickey.PublicKeyCredential;
 
 /**
  * Utility version of the attestation object which simplifies reading its properties.
@@ -25,13 +24,6 @@ public interface AttestationObjectExplorer {
     String getWebauthnId();
 
     /**
-     * Gets PublicKeySpec to use for signature verification.
-     *
-     * @return Public Key Spec
-     */
-    X509EncodedKeySpec getPublicKeySpec();
-
-    /**
      * Returns base64 encoded public key spec.
      *
      * @return base64 encoded public key spec.
@@ -45,4 +37,5 @@ public interface AttestationObjectExplorer {
      */
     String getKeyType();
 
+    PublicKeyCredential getPublicKeyCredential();
 }

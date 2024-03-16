@@ -1,4 +1,4 @@
-package com.harshalsharma.webauthncommons.attestationObject.entities;
+package com.harshalsharma.webauthncommons.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

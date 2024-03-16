@@ -1,6 +1,6 @@
 package com.harshalsharma.webauthncommons.attestationObject.parsers;
 
-import com.harshalsharma.webauthncommons.attestationObject.entities.AttestedCredentialData;
+import com.harshalsharma.webauthncommons.entities.AttestedCredentialData;
 import com.harshalsharma.webauthncommons.attestationObject.exceptions.InvalidAttestationObjException;
 import com.harshalsharma.webauthncommons.io.CborObject;
 import com.harshalsharma.webauthncommons.io.DataEncoderDecoder;

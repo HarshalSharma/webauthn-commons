@@ -1,4 +1,4 @@
-package com.harshalsharma.webauthncommons.attestationObject.exceptions;
+package com.harshalsharma.webauthncommons.publickey;
 
 public class UnsupportedPublicKeyCredential extends RuntimeException {
     public UnsupportedPublicKeyCredential(String message) {

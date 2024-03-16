@@ -1,4 +1,4 @@
-package com.harshalsharma.webauthncommons.attestationObject.entities;
+package com.harshalsharma.webauthncommons.publickey;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,17 +6,15 @@ import lombok.Getter;
 import java.util.Arrays;
 import java.util.Optional;
 
+/**
+ * https://fidoalliance.org/specs/fido-v2.0-rd-20180702/FIDO-COMPLETE-v2.0-rd-20180702.pdf
+ */
 @Getter
 @AllArgsConstructor
 public enum SupportedPublicKeyAlg {
 
     ES256(-7),
-    RS256(-40),
-    RS384(-41),
-    RS512(-42),
-    PS256(-37),
-    PS384(-38),
-    PS512(-39);
+    RS256(-257);
 
     private static final String EC = "EC";
     private static final String RSA = "RSA";

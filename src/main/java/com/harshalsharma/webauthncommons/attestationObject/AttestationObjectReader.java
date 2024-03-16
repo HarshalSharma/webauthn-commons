@@ -1,6 +1,7 @@
 package com.harshalsharma.webauthncommons.attestationObject;
 
-import com.harshalsharma.webauthncommons.attestationObject.entities.AttestationObject;
+import com.harshalsharma.webauthncommons.entities.AttestationObject;
+import com.harshalsharma.webauthncommons.attestationObject.exceptions.InvalidAttestationObjException;
 import com.harshalsharma.webauthncommons.attestationObject.parsers.AttestationObjectExplorerImpl;
 import com.harshalsharma.webauthncommons.attestationObject.parsers.AuthenticatorDataReader;
 import com.harshalsharma.webauthncommons.io.DataEncoderDecoder;
@@ -17,10 +18,14 @@ public interface AttestationObjectReader {
      * @return AttestationObjectExplorer which one can use to easily read details from AttestationObject.
      */
     static AttestationObjectExplorer read(String base64AttestationObject) {
-        AttestationObject attestationObjectRaw = DataEncoderDecoder.fromBase64Cbor(base64AttestationObject, AttestationObject.class);
-        AttestationObject attestationObject = AttestationObject.builder().fmt(attestationObjectRaw.getFmt())
-                .authData(attestationObjectRaw.getAuthData())
-                .authDataObj(AuthenticatorDataReader.read(attestationObjectRaw.getAuthData())).build();
-        return new AttestationObjectExplorerImpl(attestationObject);
+        try {
+            AttestationObject attestationObjectRaw = DataEncoderDecoder.fromBase64Cbor(base64AttestationObject, AttestationObject.class);
+            AttestationObject attestationObject = AttestationObject.builder().fmt(attestationObjectRaw.getFmt())
+                    .authData(attestationObjectRaw.getAuthData())
+                    .authDataObj(AuthenticatorDataReader.read(attestationObjectRaw.getAuthData())).build();
+            return new AttestationObjectExplorerImpl(attestationObject);
+        } catch (Exception e) {
+            throw new InvalidAttestationObjException(e);
+        }
     }
 }
