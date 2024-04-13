@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.harshalsharma.webauthncommons.io.CborObject;
 import com.harshalsharma.webauthncommons.publickey.PublicKeyCredential;
 import com.harshalsharma.webauthncommons.publickey.SupportedPublicKeyAlg;
-import com.harshalsharma.webauthncommons.publickey.UnsupportedPublicKeyCredential;
+import com.harshalsharma.webauthncommons.publickey.UnsupportedPublicKeyException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -57,7 +57,7 @@ public class PublicKeyCredentialReader {
         X509EncodedKeySpec keySpec = null;
         Optional<SupportedPublicKeyAlg> alg = SupportedPublicKeyAlg.getByCode((Integer) coseMap.getOrDefault(SIGNATURE_ALG, 0));
         if (!alg.isPresent()) {
-            throw new UnsupportedPublicKeyCredential("Unsupported Algorithm of Public key.");
+            throw new UnsupportedPublicKeyException("Unsupported Algorithm of Public key.");
         }
         try {
             if (coseMap.size() == RSA_COSE_KEY_SIZE && !coseMap.containsKey(Y_COORDINATE)) {
@@ -70,10 +70,10 @@ public class PublicKeyCredentialReader {
                 keySpec = readECKeySpec(coseMap, alg.get());
             }
         } catch (Exception e) {
-            throw new UnsupportedPublicKeyCredential("Could not read the available key.", e);
+            throw new UnsupportedPublicKeyException("Could not read the available key.", e);
         }
         if (StringUtils.isBlank(keyType) || ObjectUtils.isEmpty(keySpec)) {
-            throw new UnsupportedPublicKeyCredential("Could not read the available key.");
+            throw new UnsupportedPublicKeyException("Could not read the available key.");
         }
         return PublicKeyCredential.builder()
                 .cborPublicKeyCredential(publicKeyCredentialCbor.getCborBytes())
@@ -92,7 +92,7 @@ public class PublicKeyCredentialReader {
             ECPublicKeySpec publicKeySpec = new ECPublicKeySpec(new ECPoint(new BigInteger(x), new BigInteger(y)), params);
             return getX509EncodedKeySpec(publicKeySpec, EC_KEY_TYPE);
         }
-        throw new UnsupportedPublicKeyCredential("Unable to decode EC key");
+        throw new UnsupportedPublicKeyException("Unable to decode EC key");
     }
 
     private static X509EncodedKeySpec readRSAKeySpec(Map<Integer, Object> coseMap, SupportedPublicKeyAlg alg) {
@@ -102,7 +102,7 @@ public class PublicKeyCredentialReader {
             RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(new BigInteger(1, modulus), new BigInteger(1, publicExponent));
             return getX509EncodedKeySpec(rsaPublicKeySpec, RSA_KEY_TYPE);
         }
-        throw new UnsupportedPublicKeyCredential("Unable to decode RSA key");
+        throw new UnsupportedPublicKeyException("Unable to decode RSA key");
     }
 
     private static X509EncodedKeySpec getX509EncodedKeySpec(KeySpec keySpec, String keyType) {

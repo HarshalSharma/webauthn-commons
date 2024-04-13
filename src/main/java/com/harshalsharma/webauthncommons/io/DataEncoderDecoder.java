@@ -72,8 +72,8 @@ public final class DataEncoderDecoder {
         }
     }
 
-    private static byte[] decodeBase64Bytes(String cborEncodedBase64String) {
-        return Base64.decodeBase64(cborEncodedBase64String);
+    public static byte[] decodeBase64Bytes(String encodedBase64String) {
+        return Base64.decodeBase64(encodedBase64String);
     }
 
     public static byte[] encodeBase64(byte[] bytes) {
