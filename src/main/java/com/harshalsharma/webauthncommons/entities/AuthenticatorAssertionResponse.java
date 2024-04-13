@@ -11,6 +11,5 @@ public class AuthenticatorAssertionResponse {
     private final String base64AuthenticatorData;
     private final String base64Signature;
     private final String base64ClientDataJson;
-    private final String base64UserHandle;
 
 }
