@@ -4,7 +4,10 @@ import com.harshalsharma.webauthncommons.entities.ClientDataJson;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.Arrays;
 
 @Builder
 public class ClientDataJsonValidator {
@@ -20,7 +23,7 @@ public class ClientDataJsonValidator {
         if (!StringUtils.equals(clientDataJson.getType(), operation.getType())) {
             throw new InvalidClientDataJsonException(InvalidClientDataJsonException.INVALID_TYPE);
         }
-        if (!StringUtils.equals(clientDataJson.getChallenge(), challenge)) {
+        if (!Arrays.equals(Base64.decodeBase64(clientDataJson.getChallenge()), Base64.decodeBase64(challenge))) {
             throw new InvalidClientDataJsonException(InvalidClientDataJsonException.INVALID_CHALLENGE);
         }
     }
