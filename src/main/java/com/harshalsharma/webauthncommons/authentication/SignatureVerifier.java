@@ -4,9 +4,8 @@ import com.harshalsharma.webauthncommons.entities.AuthenticatorAssertionResponse
 import com.harshalsharma.webauthncommons.entities.ClientDataJson;
 import com.harshalsharma.webauthncommons.publickey.PublicKeyAccessor;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.util.Arrays;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import static com.harshalsharma.webauthncommons.authentication.signverifiers.SignatureVerifierFactory.getSignatureVerifier;
@@ -19,12 +18,16 @@ public interface SignatureVerifier {
                                    PublicKeyAccessor credential) {
         byte[] clientDataJsonAsBytes = Base64.decodeBase64(assertion.getBase64ClientDataJson());
         ClientDataJson clientDataJson = decodeJSON(clientDataJsonAsBytes, ClientDataJson.class);
-        if (StringUtils.isBlank(challenge) || !challenge.equals(clientDataJson.getChallenge())) {
+        byte[] challengeBytes = Base64.decodeBase64(challenge);
+        byte[] cdjChallengeBytes = Base64.decodeBase64(clientDataJson.getChallenge());
+        if (!Arrays.equals(challengeBytes, cdjChallengeBytes)) {
             return false;
         }
         byte[] clientDataJsonHash = hashSHA256(clientDataJsonAsBytes);
         byte[] authDataBytes = Base64.decodeBase64(assertion.getBase64AuthenticatorData());
-        byte[] dataToSign = Arrays.concatenate(authDataBytes, clientDataJsonHash);
+        byte[] dataToSign = new byte[authDataBytes.length + clientDataJsonHash.length];
+        System.arraycopy(authDataBytes, 0, dataToSign, 0, authDataBytes.length);
+        System.arraycopy(clientDataJsonHash, 0, dataToSign, authDataBytes.length, clientDataJsonHash.length);
         return verifySignature(dataToSign, assertion.getBase64Signature(), credential);
     }
 
@@ -33,9 +36,9 @@ public interface SignatureVerifier {
         Optional<SignatureVerifier> signatureVerifier = getSignatureVerifier(keyType);
         return signatureVerifier.map(verifier ->
                         verifier.verifySignature(data, Base64.decodeBase64(base64Signature),
-                                credential.getAlg(), credential.getEncodedKeySpec()))
+                                credential.getEncodedKeySpec()))
                 .orElse(false);
     }
 
-    boolean verifySignature(byte[] data, byte[] base64Signature, String alg, String keySpec);
+    boolean verifySignature(byte[] data, byte[] base64Signature, String keySpec);
 }
